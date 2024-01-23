@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    //3 shoots will kill the enemy
-    public int laif = 3;
+    public int life = 4;
 
 
     void Start()
@@ -13,6 +12,7 @@ public class Enemy : MonoBehaviour
         
     }
 
+    // Update is called once per frame
     void Update()
     {
         
@@ -24,13 +24,14 @@ public class Enemy : MonoBehaviour
     {
         if(other.CompareTag("Bullet"))
         {
-            laif -= 1;
+            life -= 1;
 
-            if(laif == 0 )
+            if(life == 0 )
             {
                 Destroy(this.gameObject);
 
             }
+
             Debug.Log(this.name + " Het");
         }
     }

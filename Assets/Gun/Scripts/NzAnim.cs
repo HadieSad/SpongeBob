@@ -8,11 +8,6 @@ namespace NzBulletLookDev
     {
         public float ExplodeSpeed;
         public bool IsExplode = false;
-    
-            
-            
-    
-        
         Vector3 pointA;
         public Vector3 pointB;
     
