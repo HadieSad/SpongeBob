@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int life = 4;
+    public int laif = 4;
 
 
     void Start()
@@ -24,9 +24,9 @@ public class Enemy : MonoBehaviour
     {
         if(other.CompareTag("Bullet"))
         {
-            life -= 1;
+            laif -= 1;
 
-            if(life == 0 )
+            if(laif == 0 )
             {
                 Destroy(this.gameObject);
 

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
    
-    public GameObject Hands;
+    public GameObject[] Hands;
 
     [Header("Player Movment : \n")]
 
@@ -48,9 +49,7 @@ public class Player : MonoBehaviour
 
     public GameObject Bullet;
 
-    public GameObject Bullet_Point;
-
-    public float Bullet_Speed = 100f;
+    public GameObject[] Bullet_Point;
 
     [Header("Shooting Setting : \n")]
 
@@ -64,21 +63,35 @@ public class Player : MonoBehaviour
 
     public Image Gun_Logo;
 
-    public Text Player_Laif_Text;
+    public Image laif_Line;
+
+
+
 
     [Header("Player Health : \n")]
 
-    public int Player_Laif = 5;
+    public float Player_Laif = 5;
 
+    [Header("Sounds : \n")]
+
+    public AudioSource Shoot_Sound;
+
+
+
+    private float Player_Full_Laif;
     void Start()
     {
+        Player_Full_Laif = 1 / Player_Laif;
+
         Time.timeScale = 1;
 
-        Player_Laif_Text.text = Player_Laif.ToString();
+        laif_Line.fillAmount = 1;
 
-        Player_Anim = Hands. GetComponent<Animator>();
+         Player_Anim = Hands[Selected_Wepen].GetComponent<Animator>();
         Set_Gun_Logo();
         Set_Ammo();
+
+
     }
 
     public void Get_Back_Call_Keys()
@@ -102,15 +115,26 @@ public class Player : MonoBehaviour
 
             if (No_Ammo == false)
             {
+
+               
+
                 Player_Anim.SetTrigger("Shoot");
-                GameObject B = Instantiate(Bullet, Bullet_Point.transform.position, Bullet_Point.transform.rotation);
+
+                Shoot_Sound.Play();
+
+                GameObject B = Instantiate(Bullet, Bullet_Point[Selected_Wepen].transform.position, Bullet_Point[Selected_Wepen].transform.rotation);
+
                 Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet -= 1;
+
                 Set_Ammo();
+
                 if (Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet == 0)
                 {
                     No_Ammo = true;
                     Reload();
                 }
+              
+
                 Destroy(B, 0.35f);
             }
 
@@ -132,6 +156,11 @@ public class Player : MonoBehaviour
             Reload();
         }
 
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            Cheng_Wepen();
+        }
+
     }   
    
     public void Mouse_Looke()
@@ -146,19 +175,45 @@ public class Player : MonoBehaviour
 
         Vector3 Rotate_camera = new Vector3(-MouseY, 0, 0) * Look_Speed;
 
-        Hands.transform.Rotate(Rotate_camera);
+        Hands[Selected_Wepen].transform.Rotate(Rotate_camera);
 
 
         transform.Rotate(Rotate);
 
-        Hands.transform.eulerAngles = new Vector3(Hands.transform.eulerAngles.x, Hands.transform.eulerAngles.y, 0);
+        Hands[Selected_Wepen].transform.eulerAngles = new Vector3(Hands[Selected_Wepen].transform.eulerAngles.x, Hands[Selected_Wepen].transform.eulerAngles.y, 0);
 
 
     }
 
+    public void Cheng_Wepen()
+    {
+        if (Selected_Wepen == 0)
+        {
+            Selected_Wepen = 1;
+
+            Hands[0].SetActive(false);
+
+            Hands[1].SetActive(true);
+
+
+        }
+        else
+        {
+            Selected_Wepen = 0;
+
+            Hands[1].SetActive(false);
+
+            Hands[0].SetActive(true);
+        }
+
+
+        Set_Gun_Logo();
+    }
 
     void Update()
     {
+
+       
 
         Mouse_Looke();
         Get_Back_Call_Keys();
@@ -209,43 +264,67 @@ public class Player : MonoBehaviour
     }
 
 
+   
     public void Reload()
     {
+
+
+
         Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets += Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet;
 
+        Player_Anim.SetTrigger("Reload");
+
+        if (Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets == Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload)
+        {
+            Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets = 0;
+
+            Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet = Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload;
+
+            
+            Set_Ammo();
+            Thread.Sleep(1000);
+
+            No_Ammo = false;
+        }
 
         if (Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets > Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload)
         {
 
             Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets -= Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload;
 
-            Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet += Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload;
-
+            Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet = Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload;
+  Set_Ammo();
+            Thread.Sleep(1000);
 
             No_Ammo = false;
-            Set_Ammo();
+          
         }
 
-        if (Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets == Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload)
+        if (Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets < Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload)
         {
-            Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets -= Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload;
+            Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet += Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets;
 
-            Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Bullet += Wepens[Selected_Wepen].GetComponent<Gun>().Mag_Reload;
-            
+            Wepens[Selected_Wepen].GetComponent<Gun>().full_Bullets = 0;
+      Set_Ammo();
+            Thread.Sleep(1000);
+
             No_Ammo = false;
-            Set_Ammo();
-
+      
         }
 
+       
+
+
+
 
     }
 
-    public void Cheng_Wepen()
+
+    private void OnMouseDown()
     {
-
-        Set_Gun_Logo();
+        
+     
     }
-
 
     public void Set_Ammo()
     {
@@ -254,25 +333,34 @@ public class Player : MonoBehaviour
 
     public void Set_Gun_Logo()
     {
-        Gun_Logo.sprite = Wepens[Selected_Wepen].GetComponent<Gun>().Gun_Logo;
+      
+            Gun_Logo.sprite = Wepens[Selected_Wepen].GetComponent<Gun>().Gun_Logo;
+     
+
     }
 
+    public void Set_Laif()
+    {
+        Player_Laif -= 1;
 
+        laif_Line.fillAmount -= Player_Full_Laif;
+
+
+        if (Player_Laif == 0)
+        {
+            Time.timeScale = 0;
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        
+    }
 
     private void OnCollisionEnter(Collision other)
     {
         if(other.collider.CompareTag("Enemy"))
         {
-            Player_Laif -= 1;
-
-            Player_Laif_Text.text = Player_Laif.ToString();
-
-            if (Player_Laif == 0 )
-            {
-                Time.timeScale = 0;
-
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
+            Set_Laif();
         }
     }
 
@@ -280,7 +368,7 @@ public class Player : MonoBehaviour
 }
 
 
-// ÔøΩÔøΩÔøΩ
-// ÔøΩÔøΩÔøΩÔøΩ
-// ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩÔøΩÔøΩÔøΩ
-//ÔøΩÔøΩÔøΩÔøΩÔøΩ
+// Ã«„Å
+// —·Êœ
+// »—œ«‘ ‰ „Â„« 
+//›Ê Ê‰

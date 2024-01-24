@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float BulletSpeed = 100f;
+    public float Bullet_Speed = 100f;
     void Start()
     {
         
     }
 
-    // called once per frame
+    // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector3.forward * BulletSpeed * Time.deltaTime);
+        transform.Translate(Vector3.forward * Bullet_Speed * Time.deltaTime);
     }
 }
