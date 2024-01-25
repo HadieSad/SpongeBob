@@ -1,0 +1,20 @@
+# Material file for chr_krabs_bindpose.obj
+
+newmtl Material_#41
+	Ns 0
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 0.2 0.2 0.2
+	map_Kd tex_0000_mrkrabs_128.png
+
+newmtl Material_#42
+	Ns 0
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 0.2 0.2 0.2
+	map_Kd tx1_0000_krabslids_128.png
+
